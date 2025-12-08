@@ -49,7 +49,7 @@ class MockSLAMPosePublisher:
         )
         
         # 发布频率（10Hz，模拟SLAM频率）
-        self.rate = rospy.Rate(10)
+        self.rate = rospy.Rate(100)
         
         rospy.loginfo("MockSLAMPosePublisher: Initialized")
     
@@ -109,6 +109,7 @@ class MockSLAMPosePublisher:
             
             # 发布位姿
             self.publish_pose()
+            print(self.x, self.y, self.theta)
             
             # 等待下一个周期
             self.rate.sleep()

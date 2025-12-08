@@ -26,7 +26,7 @@ class PoseProvider:
         # 订阅位姿话题
         self._pose_sub = rospy.Subscriber(
             self._pose_topic, 
-            PoseStamped, 
+            PoseWithCovarianceStamped, 
             self._pose_callback
         )
         
@@ -42,14 +42,11 @@ class PoseProvider:
             rospy.logwarn(f"Received outdated pose (delay: {time_diff:.3f}s), skipping")
             return
         
-        # x = msg.pose.pose.position.x
-        # y = msg.pose.pose.position.y
-        x = msg.pose.position.x
-        y = msg.pose.position.y
+        x = msg.pose.pose.position.x
+        y = msg.pose.pose.position.y
         
         # 从四元数转换为欧拉角（仅获取yaw）
-        # orientation_q = msg.pose.pose.orientation
-        orientation_q = msg.pose.orientation
+        orientation_q = msg.pose.pose.orientation
         _, _, yaw = euler_from_quaternion([
             orientation_q.x,
             orientation_q.y,
@@ -373,7 +370,7 @@ def main():
     rospy.init_node('modular_navigation', anonymous=True)
     
     # 初始化各模块
-    pose_provider = PoseProvider(pose_topic="/robot_pose", max_pos_jump=1.0, max_angle_jump=1.0)
+    pose_provider = PoseProvider(pose_topic="/pose", max_pos_jump=1.0, max_angle_jump=1.0)
     vel_publisher = VelocityPublisher(cmd_vel_topic="/cmd_vel")
     stop_manager = StopManager()
     obstacle_checker = ObstacleChecker()
@@ -388,9 +385,9 @@ def main():
     )
     
     # 示例：导航到目标点 (1.0, 1.0, 0.0)
-    target_x = 1.0
+    target_x = 0.0
     target_y = 0.0
-    target_yaw = math.pi / 4
+    target_yaw = 0.0
     
     rospy.loginfo("Press Enter to start navigation...")
     input()
