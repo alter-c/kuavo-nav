@@ -1,7 +1,7 @@
 import rospy
 
-class ObstacleManager:
-    """避障管理模块"""
+class ObstacleDetector:
+    """避障检测模块"""
     def __init__(self):
         pass
 

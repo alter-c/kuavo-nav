@@ -2,7 +2,7 @@ import rospy
 import threading
 from std_msgs.msg import Empty
 
-class StopManager:
+class StopHandler:
     """中断管理模块"""
     def __init__(self, _stop_topic="/navigation_stop"):
         self._stop_topic = _stop_topic
@@ -13,7 +13,7 @@ class StopManager:
             self._stop_callback
         )
         
-        rospy.loginfo(f"StopManager: Subscribing to {self._stop_topic}")
+        rospy.loginfo(f"StopHandler: Subscribed to {self._stop_topic}")
     
     def _stop_callback(self, msg):
         """外部停止信号回调"""
