@@ -81,11 +81,24 @@ class PoseProvider:
         while angle < -math.pi:
             angle += 2.0 * math.pi
         return angle
+    
+    def wait_for_pose(self, timeout=5.0):
+        """阻塞直到接收到第一帧位姿或超时（秒）"""
+        start = rospy.Time.now()
+        rate = rospy.Rate(10)
+        while not rospy.is_shutdown():
+            with self._lock:
+                if self._pose_received:
+                    return True
+            if (rospy.Time.now() - start).to_sec() > timeout:
+                return False
+            rate.sleep()
+
 
 
 class VelocityPublisher:
     """速度控制模块"""
-    def __init__(self, cmd_vel_topic="/cmd_vel", max_linear=0.5, max_angular=0.8):
+    def __init__(self, cmd_vel_topic="/cmd_vel", max_linear=0.4, max_angular=0.5):
         self._cmd_vel_topic = cmd_vel_topic
         self._max_linear = max_linear
         self._max_angular = max_angular
@@ -157,7 +170,7 @@ class ObstacleChecker:
 
 
 class NavigationCore:
-    """导航引擎核心模块，实现三阶段导航：转向目标方向 -> 移动到目标点 -> 转向目标朝向"""
+    """导航核心模块，三阶段导航：转向目标点 -> 移动到目标点 -> 转向目标朝向"""
     def __init__(
         self,
         pose_provider: PoseProvider,
@@ -179,37 +192,44 @@ class NavigationCore:
         self._rate = rospy.Rate(rate_hz)
         
         # 状态管理
-        self._is_running = False
+        self._is_navigating = False
         self._should_stop = False
         
         rospy.loginfo("NavigationCore: Initialized")
     
     def start(self, x_target, y_target, yaw_target):
         """启动导航到目标位姿"""
-        if self._is_running:
+        if self._is_navigating:
             rospy.logwarn("Navigation already running!")
             return False
+        
+        if not self._pose_provider.wait_for_pose(timeout=5.0):
+            rospy.logerr("No pose received within timeout, aborting navigation")
+            return False
             
-        self._is_running = True
+        self._is_navigating = True
         self._should_stop = False
         self._stop_manager.clear_stop()
         
         try:
             rospy.loginfo(f"Starting navigation to ({x_target}, {y_target}, {yaw_target})")
             
-            # 阶段1: 转向目标方向
+            # 阶段1: 转向目标点
+            self._rate.sleep()
             if not self._rotate_to_direction(x_target, y_target):
-                rospy.loginfo("Navigation interrupted during rotation to direction")
+                rospy.logwarn("Navigation interrupted during rotation to direction")
                 return False
             
             # 阶段2: 移动到目标点
+            self._rate.sleep()
             if not self._move_to_position(x_target, y_target):
-                rospy.loginfo("Navigation interrupted during movement to position")
+                rospy.logwarn("Navigation interrupted during movement to position")
                 return False
             
             # 阶段3: 转向目标朝向
+            self._rate.sleep()
             if not self._rotate_to_yaw(yaw_target):
-                rospy.loginfo("Navigation interrupted during rotation to yaw")
+                rospy.logwarn("Navigation interrupted during rotation to yaw")
                 return False
             
             rospy.loginfo("Navigation completed successfully")
@@ -221,15 +241,15 @@ class NavigationCore:
         finally:
             # 确保停止
             self._vel_publisher.publish_velocity(0.0, 0.0)
-            self._is_running = False
+            self._is_navigating = False
     
     def stop(self):
         """请求停止导航"""
         self._stop_manager.request_stop()
     
-    def is_running(self):
+    def is_navigating(self):
         """检查是否在运行"""
-        return self._is_running
+        return self._is_navigating
     
     def _check_stop_request(self):
         """检查停止请求"""
@@ -260,7 +280,7 @@ class NavigationCore:
             angle_diff = self._normalize_angle(target_yaw - current_yaw)
             
             if abs(angle_diff) < self._angle_tolerance:
-                rospy.logdebug(f"Rotation completed. Current: {current_yaw}, Target: {target_yaw}")
+                rospy.loginfo(f"Rotation completed. Current: {current_yaw}, Target: {target_yaw}")
                 break
             
             # P控制器
@@ -291,7 +311,7 @@ class NavigationCore:
             distance = math.hypot(dx, dy)
             
             if distance < self._pos_tolerance:
-                rospy.logdebug(f"Movement completed. Distance: {distance}")
+                rospy.loginfo(f"Movement completed. Distance: {distance}")
                 break
             
             # 计算前进方向的角度

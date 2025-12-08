@@ -66,9 +66,13 @@ class MockSLAMPosePublisher:
         
         if dt > 0:
             # 简单的积分更新（欧拉积分）
-            self.x += self.vx * dt
-            self.y += self.vy * dt
+            dx_world = self.vx * math.cos(self.theta) * dt - self.vy * math.sin(self.theta) * dt
+            dy_world = self.vx * math.sin(self.theta) * dt + self.vy * math.cos(self.theta) * dt
+
+            self.x += dx_world
+            self.y += dy_world
             self.theta += self.vtheta * dt
+
             
             # 限制角度范围到 [-π, π]
             self.theta = math.atan2(math.sin(self.theta), math.cos(self.theta))
