@@ -10,6 +10,9 @@ from geometry_msgs.msg import Twist, PoseStamped, PoseWithCovarianceStamped
 from std_msgs.msg import Empty
 from tf.transformations import euler_from_quaternion
 
+from src.navigation.control.base_controller import BaseController
+from src.navigation.control.stop_manager import StopManager
+from src.navigation.obstacle.obstacle_manager import ObstacleManager
 
 class PoseProvider:
     """位姿数据源模块，带位姿连续性检查"""
@@ -97,88 +100,14 @@ class PoseProvider:
             rate.sleep()
 
 
-
-class VelocityPublisher:
-    """速度控制模块"""
-    def __init__(self, cmd_vel_topic="/cmd_vel", max_linear=0.4, max_angular=0.5):
-        self._cmd_vel_topic = cmd_vel_topic
-        self._max_linear = max_linear
-        self._max_angular = max_angular
-        
-        # 发布速度命令
-        self._cmd_pub = rospy.Publisher(
-            self._cmd_vel_topic, 
-            Twist, 
-            queue_size=10
-        )
-        
-        rospy.loginfo(f"VelocityPublisher: Publishing to {self._cmd_vel_topic}")
-    
-    def publish_velocity(self, linear_x=0.0, angular_z=0.0):
-        """发布速度命令（带限幅）"""
-        linear_x = max(-self._max_linear, min(self._max_linear, linear_x))
-        angular_z = max(-self._max_angular, min(self._max_angular, angular_z))
-        
-        cmd = Twist()
-        cmd.linear.x = linear_x
-        cmd.linear.y = 0.0
-        cmd.linear.z = 0.0
-        cmd.angular.x = 0.0
-        cmd.angular.y = 0.0
-        cmd.angular.z = angular_z
-        
-        self._cmd_pub.publish(cmd)
-
-
-class StopManager:
-    """中断管理模块"""
-    def __init__(self):
-        self._stop_event = threading.Event()
-        # 订阅外部停止信号
-        self._stop_sub = rospy.Subscriber(
-            "/navigation_stop", 
-            Empty, 
-            self._stop_callback
-        )
-        
-        rospy.loginfo("StopManager: Ready to receive stop signals")
-    
-    def _stop_callback(self, msg):
-        """外部停止信号回调"""
-        self.request_stop()
-    
-    def request_stop(self):
-        """请求停止导航"""
-        self._stop_event.set()
-    
-    def is_stopping(self):
-        """检查是否已请求停止"""
-        return self._stop_event.is_set()
-    
-    def clear_stop(self):
-        """清除停止标志（重新开始）"""
-        self._stop_event.clear()
-
-
-class ObstacleChecker:
-    """避障接口（预留）"""
-    def check(self):
-        """检查前方是否有障碍物"""
-        return False
-    
-    def set_obstacle_callback(self, callback):
-        """预留：设置自定义避障检测回调"""
-        self._callback = callback
-
-
 class NavigationCore:
     """导航核心模块，三阶段导航：转向目标点 -> 移动到目标点 -> 转向目标朝向"""
     def __init__(
         self,
         pose_provider: PoseProvider,
-        vel_publisher: VelocityPublisher,
+        vel_publisher: BaseController,
         stop_manager: StopManager,
-        obstacle_checker: ObstacleChecker = None,
+        obstacle_checker: ObstacleManager = None,
         pos_tolerance=0.1,
         angle_tolerance=0.05,
         rate_hz=10  # 10Hz与SLAM频率匹配
@@ -186,7 +115,7 @@ class NavigationCore:
         self._pose_provider = pose_provider
         self._vel_publisher = vel_publisher
         self._stop_manager = stop_manager
-        self._obstacle_checker = obstacle_checker or ObstacleChecker()
+        self._obstacle_checker = obstacle_checker or ObstacleManager()
         
         # 导航参数
         self._pos_tolerance = pos_tolerance
@@ -264,7 +193,7 @@ class NavigationCore:
             return False
         finally:
             # 确保停止
-            self._vel_publisher.publish_velocity(0.0, 0.0)
+            self._vel_publisher.reset()
             self._is_navigating = False
     
     def stop(self):
@@ -277,7 +206,7 @@ class NavigationCore:
     
     def _check_stop_request(self):
         """检查停止请求"""
-        if self._stop_manager.is_stopping():
+        if self._stop_manager.is_stop():
             self._should_stop = True
             return True
         return False
@@ -309,11 +238,11 @@ class NavigationCore:
             
             # P控制器
             angular_speed = 1.0 * angle_diff
-            self._vel_publisher.publish_velocity(0.0, angular_speed)
+            self._vel_publisher.move(0.0, angular_speed)
             self._rate.sleep()
         
         # 停止旋转
-        self._vel_publisher.publish_velocity(0.0, 0.0)
+        self._vel_publisher.reset()
         return True
     
     def _move_to_position(self, x_target, y_target):
@@ -349,11 +278,11 @@ class NavigationCore:
             linear_speed = 0.5 * distance
             angular_speed = 1.0 * angle_error
             
-            self._vel_publisher.publish_velocity(linear_speed, angular_speed)
+            self._vel_publisher.move(linear_speed, angular_speed)
             self._rate.sleep()
         
         # 停止移动
-        self._vel_publisher.publish_velocity(0.0, 0.0)
+        self._vel_publisher.reset()
         return True
     
     def _normalize_angle(self, angle):
@@ -371,9 +300,9 @@ def main():
     
     # 初始化各模块
     pose_provider = PoseProvider(pose_topic="/pose", max_pos_jump=1.0, max_angle_jump=1.0)
-    vel_publisher = VelocityPublisher(cmd_vel_topic="/cmd_vel")
+    vel_publisher = BaseController(cmd_vel_topic="/cmd_vel")
     stop_manager = StopManager()
-    obstacle_checker = ObstacleChecker()
+    obstacle_checker = ObstacleManager()
     
     # 创建导航核心
     navigator = NavigationCore(
