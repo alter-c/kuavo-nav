@@ -24,8 +24,8 @@ def main():
     """启动导航模块"""
     rospy.init_node('kuavo_navigation', anonymous=True)
     
-    # 初始化子模块及导航节点
-    pose_provider = PoseProvider(pose_topic="/pose")
+    # 初始化子模块及导航节点(默认订阅位姿话题/robot_pose)
+    pose_provider = PoseProvider(pose_topic="/pose")  # 里程计模拟slam位姿 
 
     navigator = NavigationCore(
         pose_provider=pose_provider
@@ -39,12 +39,11 @@ def main():
     rospy.loginfo("Press Enter to start navigation...")
     input()
     
-    try:
-        navigator.start(target_x, target_y, target_yaw)
-        # navigator.stop()
+    suc = navigator.start(target_x, target_y, target_yaw)
+    if suc:
         rospy.loginfo("Navigation succeeded!")
-    except Exception as e:
-        rospy.logwarn(f"Navigation failed: {e}")
+    else:
+        rospy.logwarn(f"Navigation failed...")
 
     # rospy.spin()
 

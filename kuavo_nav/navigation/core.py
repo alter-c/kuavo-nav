@@ -100,6 +100,7 @@ class NavigationCore:
     def stop(self):
         """停止导航"""
         self._stop_handler.request_stop()
+        rospy.loginfo("Navigation stop requested")
     
     def is_navigating(self):
         """检查导航状态"""
