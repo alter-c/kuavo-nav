@@ -19,6 +19,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # TODO 添加目标节点消息发布(SLAM坐标->ROS消息)
 # TODO 定义任务节点采集与读取
+# TODO 添加导航发起及停止接口, ros订阅或web接口调用
 
 def main():
     """启动导航模块"""
@@ -30,6 +31,7 @@ def main():
     navigator = NavigationCore(
         pose_provider=pose_provider
     )
+    navigator.start()
     
     # 目标点导航示例(全局坐标)
     target_x = 1.0
@@ -39,11 +41,13 @@ def main():
     rospy.loginfo("Press Enter to start navigation...")
     input()
     
-    suc = navigator.start(target_x, target_y, target_yaw)
+    suc = navigator.navigate(target_x, target_y, target_yaw)
     if suc:
         rospy.loginfo("Navigation succeeded!")
     else:
         rospy.logwarn(f"Navigation failed...")
+
+    navigator.stop()
 
     # rospy.spin()
 

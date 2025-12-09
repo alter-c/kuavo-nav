@@ -42,6 +42,7 @@ class PoseProvider:
         _, _, yaw = euler_from_quaternion([
             quat.x, quat.y, quat.z, quat.w
         ])
+        yaw = self._normalize_angle(yaw)
         
         # 检查位姿跳变并更新
         with self._lock:

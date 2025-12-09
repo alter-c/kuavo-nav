@@ -1,12 +1,13 @@
 import rospy
 import math
 import threading
+from multiprocessing import Value
 from std_msgs.msg import Bool
 
 from . import BaseController, StopHandler, ObstacleDetector, PoseProvider
 
 
-# TODO 添加start, stop方法, 用于启动和关闭导航节点; 同时导航执行方法名称修改
+# TODO 当前位姿信息发布
 class NavigationCore:
     """
     导航核心模块
@@ -33,42 +34,42 @@ class NavigationCore:
         self._rate = rospy.Rate(rate_hz)
         
         # 状态管理
-        self._navigating = False
-
-        # 持续发布状态
-        self.pub = rospy.Publisher('/kuavo_nav/status', Bool, queue_size=10)
-        self._status_thread = threading.Thread(target=self._status_loop, daemon=True)
-        self._status_thread.start()
+        self.is_navigating = Value('b', False)
+        self.status_pub = None
+        self.status_thread = None
         
         rospy.loginfo("Navigation core initialized!")
+
+
+    def start(self):
+        """启动导航信息模块"""
+        # 持续发布状态
+        self.is_navigating.value = False
+        self.status_pub = rospy.Publisher('/navigation_status', Bool, queue_size=10)
+
+        self.status_thread = threading.Thread(target=self._status_loop, daemon=True)
+        self.status_thread.start()
+
+        rospy.loginfo("Navigation core started!")
+
+    def stop(self):
+        """停止导航模块"""
+        self.cancel()
+        rospy.loginfo("Navigation core stopped!")
+        rospy.signal_shutdown("Navigation stop requested")
 
     def _status_loop(self):
         """持续发布导航状态"""
         while not rospy.is_shutdown():
             msg = Bool()
-            msg.data = self.is_navigating()  # 只读
-            self.pub.publish(msg)
+            msg.data = self.is_navigating.value  # 只读
+            self.status_pub.publish(msg)
             self._rate.sleep()
 
-    def _at_target(self, x_target, y_target, yaw_target):
-        """检查是否已经到达目标位姿, 避免不必要导航"""
-        current_pose = self._pose_provider.get_pose()
-        if current_pose is None:
-            return False
-
-        cx, cy, cyaw = current_pose
-        tx, ty, tyaw = x_target, y_target, yaw_target
-
-        # position and yaw error
-        dist = math.hypot(tx - cx, ty - cy)
-        yaw_err = self._normalize_angle(tyaw - cyaw)
-
-        return dist < self._pos_tolerance and abs(yaw_err) < self._angle_tolerance
-
     
-    def start(self, x_target, y_target, yaw_target):
+    def navigate(self, x_target, y_target, yaw_target):
         """启动导航到目标位姿"""
-        if self._navigating:
+        if self.is_navigating.value:
             rospy.logwarn("Navigation already running!")
             return False
         
@@ -76,7 +77,7 @@ class NavigationCore:
             rospy.logerr("Timed out waiting for pose, aborting navigation")
             return False
             
-        self._navigating = True
+        self.is_navigating.value = True
         self._stop_handler.clear_stop()
         
         try:
@@ -111,18 +112,29 @@ class NavigationCore:
         
         finally:
             # 确保停止
-            self._navigating = False
+            self.is_navigating.value = False
             self._vel_publisher.reset()
     
-    def stop(self):
+    def cancel(self):
         """停止导航"""
         self._stop_handler.request_stop()
-        rospy.loginfo("Navigation stop requested")
+        rospy.loginfo("Navigation cancel requested")
     
-    def is_navigating(self):
-        """检查导航状态"""
-        return self._navigating
-    
+
+    def _at_target(self, x_target, y_target, yaw_target):
+        """检查是否已经到达目标位姿, 避免不必要导航"""
+        current_pose = self._pose_provider.get_pose()
+        if current_pose is None:
+            return False
+
+        cx, cy, cyaw = current_pose
+        tx, ty, tyaw = x_target, y_target, yaw_target
+
+        # position and yaw error
+        dist = math.hypot(tx - cx, ty - cy)
+        yaw_err = self._normalize_angle(tyaw - cyaw)
+
+        return dist < self._pos_tolerance and abs(yaw_err) < self._angle_tolerance
     
     def _rotate_to(self, target_yaw):
         """原地旋转到目标角度"""

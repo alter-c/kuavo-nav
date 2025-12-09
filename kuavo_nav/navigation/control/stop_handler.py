@@ -2,6 +2,8 @@ import rospy
 import threading
 from std_msgs.msg import Empty
 
+
+# TODO 删除订阅停止话题, 目前为方便调试而保留
 class StopHandler:
     """中断管理模块"""
     def __init__(self, _stop_topic="/navigation_stop"):
