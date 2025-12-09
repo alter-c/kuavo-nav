@@ -5,6 +5,8 @@ from std_msgs.msg import Bool
 
 from . import BaseController, StopHandler, ObstacleDetector, PoseProvider
 
+
+# TODO 添加start, stop方法, 用于启动和关闭导航节点; 同时导航执行方法名称修改
 class NavigationCore:
     """
     导航核心模块
