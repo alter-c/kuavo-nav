@@ -1,5 +1,7 @@
 import rospy
 import math
+import threading
+from std_msgs.msg import Bool
 
 from . import BaseController, StopHandler, ObstacleDetector, PoseProvider
 
@@ -30,8 +32,21 @@ class NavigationCore:
         
         # 状态管理
         self._navigating = False
+
+        # 持续发布状态
+        self.pub = rospy.Publisher('/kuavo_nav/status', Bool, queue_size=10)
+        self._status_thread = threading.Thread(target=self._status_loop, daemon=True)
+        self._status_thread.start()
         
         rospy.loginfo("Navigation core initialized!")
+
+    def _status_loop(self):
+        """持续发布导航状态"""
+        while not rospy.is_shutdown():
+            msg = Bool()
+            msg.data = self.is_navigating()  # 只读
+            self.pub.publish(msg)
+            self._rate.sleep()
 
     def _at_target(self, x_target, y_target, yaw_target):
         """检查是否已经到达目标位姿, 避免不必要导航"""

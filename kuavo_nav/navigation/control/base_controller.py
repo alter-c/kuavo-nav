@@ -3,7 +3,7 @@ from geometry_msgs.msg import Twist
 
 class BaseController:
     """基础运动控制模块"""
-    def __init__(self, cmd_vel_topic="/cmd_vel", max_linear=0.5, max_angular=0.5):
+    def __init__(self, cmd_vel_topic="/cmd_vel", max_linear=0.3, max_angular=0.5):
         self._cmd_vel_topic = cmd_vel_topic
         self._max_linear = max_linear
         self._max_angular = max_angular

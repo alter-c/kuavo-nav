@@ -34,7 +34,7 @@ def main():
     # 目标点导航示例(全局坐标)
     target_x = 1.0
     target_y = 1.0
-    target_yaw = math.pi / 2 
+    target_yaw = math.pi / 2
     
     rospy.loginfo("Press Enter to start navigation...")
     input()
