@@ -1,10 +1,7 @@
 import rospy
 import math
 
-from src.navigation.control.base_controller import BaseController
-from src.navigation.control.stop_handler import StopHandler
-from src.navigation.obstacle.obstacle_detector import ObstacleDetector
-from src.navigation.sensor.pose_provider import PoseProvider
+from . import BaseController, StopHandler, ObstacleDetector, PoseProvider
 
 class NavigationCore:
     """

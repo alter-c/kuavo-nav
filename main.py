@@ -6,8 +6,8 @@ import signal
 import sys
 import math
 
-from src.navigation.sensor.pose_provider import PoseProvider
-from src.navigation.core import NavigationCore
+from kuavo_nav.navigation import PoseProvider
+from kuavo_nav import NavigationCore
 
 
 def signal_handler(sig, frame):
