@@ -8,8 +8,14 @@ import sys
 from std_msgs.msg import String, Bool
 from flask import Flask, request, jsonify
 
+
 rospy.init_node('web', anonymous=True)
 cmd_pub = rospy.Publisher('/navigation/command', String, queue_size=10)
+def get_state():
+    state_msg = rospy.wait_for_message("/navigation/state", String, timeout=1.0)
+    return json.loads(state_msg.data)
+
+# flask app
 app = Flask(__name__)
 
 @app.route("/api/navigation/start", methods=["GET"])
@@ -38,11 +44,12 @@ def stop():
 
 @app.route("/api/navigation/state", methods=["GET"])
 def state():
-    nav_state = rospy.wait_for_message("/navigation/state", Bool, timeout=1.0)
-    rospy.loginfo(f"Received state: {nav_state.data}")
+    nav_state = get_state()
     return jsonify({
-        "state": nav_state.data
-        })
+        "success": True,
+        "message": None,
+        "data": nav_state
+    })
 
 def ros_spin_thread():
     """保持订阅的线程"""

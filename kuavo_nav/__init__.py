@@ -1,7 +1,6 @@
 from .navigation.core import NavigationCore
-from .command_manager import CommandManager
-from .state_publisher import StatePublisher
+from .manager import NavigationManager
 
-__all__ = ["NavigationCore", "CommandManager", "StatePublisher"]
+__all__ = ["NavigationCore", "NavigationManager"]
 
 __version__ = "0.1.0"

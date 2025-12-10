@@ -6,7 +6,7 @@ from std_msgs.msg import String
 from . import BaseController, StopHandler, ObstacleDetector, PoseProvider
 
 
-class NavigationState(Enum):
+class NavigationStatus(Enum):
     IDLE = "idle"
     STARTING = "starting"
     NAVIGATING = "navigating"
@@ -14,7 +14,7 @@ class NavigationState(Enum):
     OBSTACLE = "obstacle"
     FAILED = "failed"
 
-# TODO 当前导航状态管理, 并定义相关类持续管理和发布
+# TODO 优化导航状态, 导航状态设置带锁读和写方法(is_running保留)
 class NavigationCore:
     """
     导航核心模块
