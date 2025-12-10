@@ -98,6 +98,10 @@ class NavigationCore:
         self._stop_handler.request_stop()
         rospy.loginfo("Navigation cancel requested")
     
+    def shutdown(self):
+        """安全退出导航"""
+        rospy.logwarn("Navigation core shutdown!")
+        self._vel_publisher.reset()
 
     def _at_target(self, x_target, y_target, yaw_target):
         """检查是否已经到达目标位姿, 避免不必要导航"""

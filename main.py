@@ -19,5 +19,11 @@ if __name__ == '__main__':
 
     state_publisher.start()
     rospy.loginfo("Kuavo Navigation Node is running...")
+
+    # 异常退出处理
+    def nav_shutdown():
+        navigator.shutdown()
+    rospy.on_shutdown(nav_shutdown)
+
     rospy.spin()
 

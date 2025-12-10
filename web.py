@@ -3,9 +3,10 @@
 import rospy
 import json
 import threading
+import signal
+import sys
 from std_msgs.msg import String, Bool
 from flask import Flask, request, jsonify
-
 
 rospy.init_node('web', anonymous=True)
 cmd_pub = rospy.Publisher('/navigation/command', String, queue_size=10)
@@ -31,7 +32,7 @@ def start():
 @app.route("/api/navigation/stop", methods=["GET"])
 def stop():
     cmd = {"command": "cancel"}
-    cmd_pub.publish(String(data=str(cmd)))
+    cmd_pub.publish(String(data=json.dumps(cmd)))
     rospy.loginfo("Published cancel command")
     return 
 
@@ -47,7 +48,13 @@ def ros_spin_thread():
     """保持订阅的线程"""
     rospy.spin()
 
+def signal_handler(sig, frame):
+    rospy.signal_shutdown("User interrupt")
+    sys.exit(0)
+
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, signal_handler)
+
     ros_thread = threading.Thread(target=ros_spin_thread, daemon=True)
     ros_thread.start()
 
