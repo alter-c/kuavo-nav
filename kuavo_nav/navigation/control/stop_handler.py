@@ -3,23 +3,13 @@ import threading
 from std_msgs.msg import Empty
 
 
-# TODO 删除订阅停止话题, 目前为方便调试而保留
 class StopHandler:
     """中断管理模块"""
     def __init__(self, _stop_topic="/navigation_stop"):
         self._stop_topic = _stop_topic
         self._stop_event = threading.Event()
-        self._stop_sub = rospy.Subscriber(
-            self._stop_topic, 
-            Empty, 
-            self._stop_callback
-        )
         
         rospy.loginfo(f"StopHandler: Subscribed to {self._stop_topic}")
-    
-    def _stop_callback(self, msg):
-        """外部停止信号回调"""
-        self.request_stop()
     
     def request_stop(self):
         """发布停止信号"""
