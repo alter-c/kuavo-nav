@@ -28,7 +28,7 @@ def start():
     cmd_pub.publish(String(data=json.dumps(cmd)))
     rospy.loginfo(f"Published navigation command: {cmd}")
     nav_state = get_state()
-    # nav_state["status"] = "starting"
+    nav_state["status"] = "starting"
     return jsonify({
         "success": True,
         "message": None,
@@ -51,16 +51,23 @@ def stop():
 
 @app.route("/api/navigation/state", methods=["GET"])
 def state():
+    task_id = str(request.args.get("task_id"))
     nav_state = get_state()
-    return jsonify({
-        "success": True,
-        "message": None,
-        "data": nav_state
-    })
+    if task_id and nav_state["task_id"] == task_id:
+        return jsonify({
+            "success": True,
+            "message": None,
+            "data": nav_state
+        })
+    else:
+        return jsonify({
+            "success": False,
+            "message": "task not found"
+        }), 404
 
 # test pose nav
-@app.route("/api/navigation/pose", methods=["GET"])
-def pose_nav():
+@app.route("/api/navigation/nav", methods=["GET"])
+def nav():
     x = float(request.args.get("x", 0.0))
     y = float(request.args.get("y", 0.0))
     yaw = float(request.args.get("yaw", 0.0))
@@ -92,6 +99,7 @@ if __name__ == '__main__':
     ros_thread.start()
 
     app.run(host='0.0.0.0', port=8080)
-    # curl "http://0.0.0.0:8080/api/navigation/start?x=1.0&y=1.0&yaw=1.57"
+    # curl "http://0.0.0.0:8080/api/navigation/start?cid=point_1"
+    # curl "http://0.0.0.0:8080/api/navigation/nav?x=1.0&y=1.0&yaw=1.57"
 
 
