@@ -1,25 +1,27 @@
 import rospy
 import json
-import threading
 import uuid
+import math
+import threading
 from datetime import datetime
 from std_msgs.msg import String
 
 from .navigation.core import NavigationCore
 
-# TODO 优化命令格式
-# TODO 同步core优化导航状态
+
 class NavigationManager:
     """导航管理模块"""
     def __init__(
         self,
         navigator: NavigationCore=None,
+        map_file: str="configs/task_map.json",
         rate_hz: int=10
     ):
         if navigator is None:
             raise ValueError("NavigationCore is not initialized")
         
         self._navigator = navigator
+        self._map = load_map(map_file)
         self._rate = rospy.Rate(rate_hz)
         self._lock = threading.Lock()
 
@@ -30,6 +32,7 @@ class NavigationManager:
         self.task_id = None
         self.cat_id = None
         self.start_time = None
+        self.target_pose = None
 
         # 导航相关状态发布
         self.state_pub = None
@@ -42,37 +45,48 @@ class NavigationManager:
         self.state_thread.start()
         rospy.loginfo("Navigation manager started!")
 
+    def get_state(self):
+        """获取导航状态信息"""
+        with self._lock:
+            task_id = self.task_id
+            cat_id = self.cat_id
+            start_time = self.start_time
+            target_pose = self.target_pose
+        pose = self._navigator._pose_provider.pose
+        status = self._navigator.status
+        dist_user = None 
+        dist_prod = math.hypot(
+            pose[0] - target_pose[0], 
+            pose[1] - target_pose[1]
+        ) if pose and target_pose else None
+        nav_time = round(
+            (rospy.Time.now() - start_time).to_sec()
+        ) if start_time else None
+        update_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        return {
+            "task_id": task_id,
+            "category_id": cat_id,
+            "status": status,
+            "distance_user": dist_user,
+            "distance_prod": dist_prod,
+            "navigation_time": nav_time,
+            "update_time": update_time
+        }
+
     def _state_pub_loop(self):
         """持续更新并发布导航状态"""
         while not rospy.is_shutdown():
-            with self._lock:
-                task_id = self.task_id
-                cat_id = self.cat_id
-                start_time = self.start_time
-            pose = self._navigator._pose_provider.get_pose()
-            dist_user = None 
-            dist_prod = None # TODO 计算距离
-            status = self._navigator.is_running
-            nav_time = round((rospy.Time.now() - start_time).to_sec()) if start_time else None
-            update_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-
-            state_msg = {
-                "task_id": task_id,
-                "category_id": cat_id,
-                "status": status,
-                "distance_user": dist_user,
-                "distance_prod": dist_prod,
-                "navigation_time": nav_time,
-                "update_time": update_time
-            }
-            self.state_pub.publish(String(data=json.dumps(state_msg)))
+            state = self.get_state()
+            self.state_pub.publish(String(data=json.dumps(state)))
+            # rospy.loginfo(f"Published /navigation/state: {state}")
             self._rate.sleep()
 
     def _cmd_callback(self, msg: String):
         """解析命令并执行"""
         try:
             cmd_dict = json.loads(msg.data)
-            command = cmd_dict.get("command", "")
+            command = cmd_dict.get("command")
             if command == "navigate":
                 rospy.loginfo("Received navigate command")
                 self._handle_navigate(cmd_dict)
@@ -83,17 +97,19 @@ class NavigationManager:
                 rospy.logwarn(f"Unknown command: {command}")
                 
         except Exception as e:
-            rospy.logerr(f"Unexpected error during command process: {e}")
+            rospy.logerr(f"Error during command process: {e}")
 
     def _handle_navigate(self, cmd_dict: dict):
         """处理导航命令"""
-        target = cmd_dict.get("target", {})
-        x = target.get("x", 0.0)
-        y = target.get("y", 0.0)
-        yaw = target.get("yaw", 0.0)
-
-        self._update_task(cid=None)
+        try:
+            target = cmd_dict.get("target")
+            cid, pose = self._parse_target(target)
+        except Exception as e:
+            rospy.logerr(f"Error during navigation target parsing: {e}")
+            return
+        self._update_task(cid=cid, pose=pose)
         # 线程启动导航
+        x, y, yaw = pose
         nav_thread = threading.Thread(
             target=self._navigator.navigate, 
             args=(x, y, yaw),
@@ -107,9 +123,44 @@ class NavigationManager:
         self._navigator.cancel()
         return
     
-    def _update_task(self, cid: str=None):
+    def _parse_target(self, target) -> tuple[str, tuple]:
+        """解析导航目标"""
+        # 任务点导航
+        if isinstance(target, str):
+            if self._map is None or target not in self._map:
+                raise ValueError(f"Target category id '{target}' not found in map")
+            cid_info = self._map[target]
+            if not cid_info.get("pose"):
+                raise ValueError(f"Category id '{target}' has no pose information")
+            cid = target
+            x, y, yaw = cid_info.get("pose")
+
+        # 坐标导航
+        elif isinstance(target, dict):
+            cid = None
+            x = target.get("x")
+            y = target.get("y")
+            yaw = target.get("yaw")
+
+        else:
+            raise TypeError(f"Invalid target format: {type(target)}")
+        
+        return cid, (x, y, yaw)
+
+    def _update_task(self, cid: str=None, pose: tuple=None):
         """更新任务信息"""
         with self._lock:
             self.task_id = str(uuid.uuid4())
             self.cat_id = cid
             self.start_time = rospy.Time.now()
+            self.target_pose = pose
+
+    
+def load_map(file_path: str) -> dict:
+    try:
+        with open(file_path, 'r') as f:
+            task_map = json.load(f)
+    except Exception as e:
+        print(f"Failed to load task map: {e}")
+        task_map = None
+    return task_map

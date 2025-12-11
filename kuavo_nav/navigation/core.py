@@ -1,12 +1,13 @@
 import rospy
 import math
+import threading
 from enum import Enum
 from std_msgs.msg import String
 
 from . import BaseController, StopHandler, ObstacleDetector, PoseProvider
 
 
-class NavigationStatus(Enum):
+class NavStatus(Enum):
     IDLE = "idle"
     STARTING = "starting"
     NAVIGATING = "navigating"
@@ -14,7 +15,6 @@ class NavigationStatus(Enum):
     OBSTACLE = "obstacle"
     FAILED = "failed"
 
-# TODO 优化导航状态, 导航状态设置带锁读和写方法(is_running保留)
 class NavigationCore:
     """
     导航核心模块
@@ -41,31 +41,44 @@ class NavigationCore:
         self._rate = rospy.Rate(rate_hz)
         
         # 状态管理
+        self._lock = threading.Lock()
+        self._status = NavStatus.IDLE
         self.is_running = False
         
         rospy.loginfo("Navigation core initialized!")
 
+    @property
+    def status(self):
+        """获取当前导航状态"""
+        with self._lock:
+            return self._status.value
     
     def navigate(self, x_target, y_target, yaw_target):
         """启动导航到目标位姿"""
         if self.is_running:
             rospy.logwarn("Navigation already running!")
             return False
+        else:
+            rospy.loginfo("Navigation starting...")
+            self._update_status(NavStatus.STARTING)
         
         if not self._pose_provider.wait_for_pose():
             rospy.logerr("Timed out waiting for pose, aborting navigation")
+            self._update_status(NavStatus.FAILED)
             return False
-            
+
         self.is_running = True
         self._stop_handler.clear_stop()
         
         try:
-            rospy.loginfo(f"Starting navigation to target (x={x_target:.3f}m, y={y_target:.3f}m, yaw={yaw_target:.3f}rad)")
-
             if self._at_target(x_target, y_target, yaw_target):
                 rospy.loginfo("Already at target pose, skipping navigation")
+                self._update_status(NavStatus.ARRIVED)
                 return True
             
+            rospy.loginfo(f"Navigating to target (x={x_target:.3f}m, y={y_target:.3f}m, yaw={yaw_target:.3f}rad)")
+            self._update_status(NavStatus.NAVIGATING)
+
             # 阶段1: 转向目标点
             if not self._rotate_to_direction(x_target, y_target):
                 rospy.logwarn("Navigation interrupted during stage1: Rotation to direction")
@@ -82,10 +95,12 @@ class NavigationCore:
                 return False
             
             rospy.loginfo("Navigation completed!")
+            self._update_status(NavStatus.ARRIVED)
             return True
             
         except Exception as e:
             rospy.logerr(f"Navigation error: {e}")
+            self._update_status(NavStatus.FAILED)
             return False
         
         finally:
@@ -95,8 +110,9 @@ class NavigationCore:
     
     def cancel(self):
         """停止导航"""
-        self._stop_handler.request_stop()
         rospy.loginfo("Navigation cancel requested")
+        self._stop_handler.request_stop()
+        self._update_status(NavStatus.FAILED)
     
     def shutdown(self):
         """安全退出导航"""
@@ -105,7 +121,7 @@ class NavigationCore:
 
     def _at_target(self, x_target, y_target, yaw_target):
         """检查是否已经到达目标位姿, 避免不必要导航"""
-        current_pose = self._pose_provider.get_pose()
+        current_pose = self._pose_provider.pose
         if current_pose is None:
             return False
 
@@ -125,7 +141,7 @@ class NavigationCore:
             if self._stop_handler.is_stop():
                 break
             
-            _, _, current_yaw = self._pose_provider.get_pose()
+            _, _, current_yaw = self._pose_provider.pose
             
             # 判断是否到达目标角度
             angle_error = self._normalize_angle(target_yaw - current_yaw)
@@ -146,7 +162,7 @@ class NavigationCore:
     
     def _rotate_to_direction(self, x_target, y_target):
         """阶段1: 转向目标点方向"""
-        current_x, current_y, _ = self._pose_provider.get_pose()
+        current_x, current_y, _ = self._pose_provider.pose
         target_yaw = math.atan2(y_target - current_y, x_target - current_x)
         rospy.loginfo(f"Rotating to target position (direction yaw={target_yaw:.3f}rad)")
         return self._rotate_to(target_yaw)
@@ -162,9 +178,12 @@ class NavigationCore:
             # TODO 避障
             if self._obstacle_detector.check():
                 rospy.logwarn("Obstacle detected!")
+                self._update_status(NavStatus.OBSTACLE)
+                # 避障或停障处理
+                self._update_status(NavStatus.NAVIGATING)
                 pass
             
-            current_x, current_y, current_yaw = self._pose_provider.get_pose()
+            current_x, current_y, current_yaw = self._pose_provider.pose
             
             # 计算到目标的距离
             dx = x_target - current_x
@@ -195,6 +214,10 @@ class NavigationCore:
         """阶段3: 转向目标朝向"""
         rospy.loginfo(f"Rotating to target yaw={target_yaw:.3f}rad")
         return self._rotate_to(target_yaw)
+
+    def _update_status(self, new_status: NavStatus):
+        with self._lock:
+            self._status = new_status
     
     def _normalize_angle(self, angle):
         while angle > math.pi:

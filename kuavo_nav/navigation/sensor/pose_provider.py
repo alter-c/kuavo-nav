@@ -4,6 +4,7 @@ import threading
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from tf.transformations import euler_from_quaternion
 
+
 class PoseProvider:
     """位姿数据管理模块"""
     def __init__(self, pose_topic="/robot_pose", max_pos_jump=0.5, max_angle_jump=0.5):
@@ -22,6 +23,12 @@ class PoseProvider:
         )
         
         rospy.loginfo(f"PoseProvider: Subscribed to {self._pose_topic}")
+
+    @property
+    def pose(self):
+        """获取当前位姿"""
+        with self._lock:
+            return self._pose
     
     def _pose_callback(self, msg):
         """位姿信息回调"""
@@ -44,7 +51,8 @@ class PoseProvider:
         ])
         yaw = self._normalize_angle(yaw)
         
-        # 检查位姿跳变并更新
+        # 检查位姿跳变并更新 
+        # TODO 位姿滤波
         with self._lock:
             if self._pose is not None:
                 last_x, last_y, last_yaw = self._pose
@@ -58,7 +66,19 @@ class PoseProvider:
 
             self._pose = (x, y, yaw)
             self._stamp = msg.header.stamp
-
+    
+    def wait_for_pose(self, timeout=5.0):
+        """阻塞等待位姿消息"""
+        start = rospy.Time.now()
+        rate = rospy.Rate(10)
+        while not rospy.is_shutdown():
+            if self._pose is not None:
+                return True
+            if (rospy.Time.now() - start).to_sec() > timeout:
+                return False
+            rate.sleep()
+        return False
+    
     def _normalize_angle(self, angle):
         """将角度归一化到 [-π, π] 范围"""
         while angle > math.pi:
@@ -66,20 +86,3 @@ class PoseProvider:
         while angle < -math.pi:
             angle += 2.0 * math.pi
         return angle
-
-    def get_pose(self):
-        """获取当前位姿"""
-        with self._lock:
-            return self._pose
-    
-    def wait_for_pose(self, timeout=5.0):
-        """阻塞等待位姿消息"""
-        start = rospy.Time.now()
-        rate = rospy.Rate(10)
-        while not rospy.is_shutdown():
-            with self._lock:
-                if self._pose is not None:
-                    return True
-            if (rospy.Time.now() - start).to_sec() > timeout:
-                return False
-            rate.sleep()
