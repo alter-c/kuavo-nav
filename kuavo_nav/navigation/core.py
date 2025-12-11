@@ -41,36 +41,37 @@ class NavigationCore:
         self._rate = rospy.Rate(rate_hz)
         
         # 状态管理
-        self._lock = threading.Lock()
+        self._status_lock = threading.Lock()
         self._status = NavStatus.IDLE
-        self.is_running = False
+        self._run_lock = threading.Lock()
+        self._running = False
         
         rospy.loginfo("Navigation core initialized!")
 
     @property
     def status(self):
         """获取当前导航状态"""
-        with self._lock:
+        with self._status_lock:
             return self._status.value
     
     def navigate(self, x_target, y_target, yaw_target):
         """启动导航到目标位姿"""
-        if self.is_running:
-            rospy.logwarn("Navigation already running!")
-            return False
-        else:
-            rospy.loginfo("Navigation starting...")
-            self._update_status(NavStatus.STARTING)
-        
-        if not self._pose_provider.wait_for_pose():
-            rospy.logerr("Timed out waiting for pose, aborting navigation")
-            self._update_status(NavStatus.FAILED)
-            return False
-
-        self.is_running = True
+        with self._run_lock:
+            if self._running:
+                rospy.logwarn("Navigation already running!")
+                return False
+            else:
+                rospy.loginfo("Navigation starting...")
+                self._running = True
+                self._update_status(NavStatus.STARTING)
         self._stop_handler.clear_stop()
         
         try:
+            if not self._pose_provider.wait_for_pose():
+                rospy.logerr("Timed out waiting for pose, aborting navigation")
+                self._update_status(NavStatus.FAILED)
+                return False
+            
             if self._at_target(x_target, y_target, yaw_target):
                 rospy.loginfo("Already at target pose, skipping navigation")
                 self._update_status(NavStatus.ARRIVED)
@@ -105,7 +106,8 @@ class NavigationCore:
         
         finally:
             # 确保停止
-            self.is_running = False
+            with self._run_lock:
+                self._running = False 
             self._vel_publisher.reset()
     
     def cancel(self):
@@ -236,7 +238,7 @@ class NavigationCore:
         return True
 
     def _update_status(self, new_status: NavStatus):
-        with self._lock:
+        with self._status_lock:
             self._status = new_status
     
     def _normalize_angle(self, angle):
