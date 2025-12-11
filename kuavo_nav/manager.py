@@ -110,6 +110,7 @@ class NavigationManager:
         self._update_task(cid=cid, pose=pose)
         # 线程启动导航
         x, y, yaw = pose
+        # TODO 封装导航和动作, 统一线程执行
         nav_thread = threading.Thread(
             target=self._navigator.navigate, 
             args=(x, y, yaw),
