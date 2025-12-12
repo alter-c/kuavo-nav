@@ -10,8 +10,8 @@ class PoseProvider:
     def __init__(self, pose_topic="/robot_pose", max_pos_jump=0.5, max_angle_jump=0.5):
         self._pose_topic = pose_topic
         self._lock = threading.Lock()
-        self._pose = None
-        self._stamp = rospy.Time(0)
+        self._pose = None               # 当前位姿
+        self._stamp = rospy.Time.now()  # 位姿时间戳
         self._max_pos_jump = max_pos_jump      # 最大位置跳变阈值
         self._max_angle_jump = max_angle_jump  # 最大角度跳变阈值
         
@@ -28,6 +28,9 @@ class PoseProvider:
     def pose(self):
         """获取当前位姿"""
         with self._lock:
+            delay_pose = (rospy.Time.now() - self._stamp).to_sec()
+            if delay_pose > 1.0:
+                rospy.logwarn(f"Pose data is outdated (delay: {delay_pose:.3f}s)")
             return self._pose
     
     def _pose_callback(self, msg):
