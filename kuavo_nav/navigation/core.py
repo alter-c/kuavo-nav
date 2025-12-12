@@ -41,36 +41,37 @@ class NavigationCore:
         self._rate = rospy.Rate(rate_hz)
         
         # 状态管理
-        self._lock = threading.Lock()
+        self._status_lock = threading.Lock()
         self._status = NavStatus.IDLE
-        self.is_running = False
+        self._run_lock = threading.Lock()
+        self._running = False
         
         rospy.loginfo("Navigation core initialized!")
 
     @property
     def status(self):
         """获取当前导航状态"""
-        with self._lock:
+        with self._status_lock:
             return self._status.value
     
     def navigate(self, x_target, y_target, yaw_target):
         """启动导航到目标位姿"""
-        if self.is_running:
-            rospy.logwarn("Navigation already running!")
-            return False
-        else:
-            rospy.loginfo("Navigation starting...")
-            self._update_status(NavStatus.STARTING)
-        
-        if not self._pose_provider.wait_for_pose():
-            rospy.logerr("Timed out waiting for pose, aborting navigation")
-            self._update_status(NavStatus.FAILED)
-            return False
-
-        self.is_running = True
+        with self._run_lock:
+            if self._running:
+                rospy.logwarn("Navigation already running!")
+                return False
+            else:
+                rospy.loginfo("Navigation starting...")
+                self._running = True
+                self._update_status(NavStatus.STARTING)
         self._stop_handler.clear_stop()
         
         try:
+            if not self._pose_provider.wait_for_pose():
+                rospy.logerr("Timed out waiting for pose, aborting navigation")
+                self._update_status(NavStatus.FAILED)
+                return False
+            
             if self._at_target(x_target, y_target, yaw_target):
                 rospy.loginfo("Already at target pose, skipping navigation")
                 self._update_status(NavStatus.ARRIVED)
@@ -105,7 +106,8 @@ class NavigationCore:
         
         finally:
             # 确保停止
-            self.is_running = False
+            with self._run_lock:
+                self._running = False 
             self._vel_publisher.reset()
     
     def cancel(self):
@@ -141,6 +143,12 @@ class NavigationCore:
             if self._stop_handler.is_stop():
                 break
             
+            # TODO 障碍检测
+            if self._obstacle_detector.check():
+                # 避障失败或中途停止
+                if not self._handle_obstacle():
+                    break
+
             _, _, current_yaw = self._pose_provider.pose
             
             # 判断是否到达目标角度
@@ -175,14 +183,10 @@ class NavigationCore:
             if self._stop_handler.is_stop():
                 break
             
-            # TODO 避障
             if self._obstacle_detector.check():
-                rospy.logwarn("Obstacle detected!")
-                self._update_status(NavStatus.OBSTACLE)
-                # 避障或停障处理
-                self._update_status(NavStatus.NAVIGATING)
-                pass
-            
+                if not self._handle_obstacle():
+                    break
+
             current_x, current_y, current_yaw = self._pose_provider.pose
             
             # 计算到目标的距离
@@ -214,9 +218,27 @@ class NavigationCore:
         """阶段3: 转向目标朝向"""
         rospy.loginfo(f"Rotating to target yaw={target_yaw:.3f}rad")
         return self._rotate_to(target_yaw)
+    
+    def _handle_obstacle(self):
+        """避障处理"""
+        # 停障
+        rospy.logwarn("Obstacle detected!")
+        self._vel_publisher.reset()
+        self._update_status(NavStatus.OBSTACLE)
+        # TODO 避障语音
+        self._obstacle_detector.report()
+        while not self._obstacle_detector.check():
+            if self._stop_handler.is_stop():
+                # 障碍物未清除且收到停止指令, 直接退出, 防止死循环
+                return False
+            self._rate.sleep()
+        # 避障后恢复导航状态
+        rospy.loginfo("Obstacle cleared")
+        self._update_status(NavStatus.NAVIGATING)
+        return True
 
     def _update_status(self, new_status: NavStatus):
-        with self._lock:
+        with self._status_lock:
             self._status = new_status
     
     def _normalize_angle(self, angle):

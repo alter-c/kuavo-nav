@@ -12,3 +12,7 @@ class ObstacleDetector:
         """检查障碍物"""
         return False
     
+    def report(self):
+        """遇障播报"""
+        pass
+    
