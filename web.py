@@ -62,7 +62,8 @@ def state():
     else:
         return jsonify({
             "success": False,
-            "message": "task not found"
+            "message": "Task not found",
+            "data": None
         }), 404
 
 # test pose nav

@@ -123,7 +123,7 @@ class NavigationManager:
         self._navigator.cancel()
         return
     
-    def _parse_target(self, target) -> (str, tuple):
+    def _parse_target(self, target):
         """解析导航目标"""
         # 任务点导航
         if isinstance(target, str):
