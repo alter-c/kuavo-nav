@@ -1,13 +1,14 @@
 import rospy
 import math
 import threading
-from geometry_msgs.msg import PoseWithCovarianceStamped
+# from geometry_msgs.msg import PoseWithCovarianceStamped
+from nav_msgs.msg import Odometry 
 from tf.transformations import euler_from_quaternion
 
 
 class PoseProvider:
     """位姿数据管理模块"""
-    def __init__(self, pose_topic="/robot_pose", max_pos_jump=0.5, max_angle_jump=0.5):
+    def __init__(self, pose_topic="/fuse_pose", max_pos_jump=0.5, max_angle_jump=0.5):
         self._pose_topic = pose_topic
         self._lock = threading.Lock()
         self._pose = None               # 当前位姿
@@ -15,10 +16,10 @@ class PoseProvider:
         self._max_pos_jump = max_pos_jump      # 最大位置跳变阈值
         self._max_angle_jump = max_angle_jump  # 最大角度跳变阈值
         
-        # 位姿消息类型固定 PoseWithCovarianceStamped
+        # 位姿消息类型固定 Odometry
         self._pose_sub = rospy.Subscriber(
             self._pose_topic, 
-            PoseWithCovarianceStamped, 
+            Odometry, 
             self._pose_callback
         )
         

@@ -12,7 +12,8 @@ if __name__ == '__main__':
     rospy.init_node('kuavo_navigation', anonymous=True)
 
     # 初始化子模块及导航节点(默认订阅位姿话题/robot_pose)
-    pose_provider = PoseProvider(pose_topic="/pose")  # 里程计模拟slam位姿 
+    # pose_provider = PoseProvider(pose_topic="/pose")  # 里程计模拟slam位姿 
+    pose_provider = PoseProvider()  # 使用默认的/fuse_pose话题
     navigator = NavigationCore(pose_provider=pose_provider)
     nav_manager = NavigationManager(navigator=navigator)
 
