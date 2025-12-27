@@ -1,0 +1,7 @@
+image: /home/kuavo/maps/baai_2l/map_2d.pgm
+resolution: 0.050000
+origin: [-11.460225, -41.075977, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+

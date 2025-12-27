@@ -227,7 +227,7 @@ class NavigationCore:
         self._update_status(NavStatus.OBSTACLE)
         # TODO 避障语音
         self._obstacle_detector.report()
-        while not self._obstacle_detector.check():
+        while self._obstacle_detector.check():
             if self._stop_handler.is_stop():
                 # 障碍物未清除且收到停止指令, 直接退出, 防止死循环
                 return False

@@ -1,0 +1,716 @@
+Routes:
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - -0.6884658932685852
+    - 1.3666093349456787
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 1.5222742557525635
+    - -0.14448745548725128
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 1.5222742557525635
+    - -0.14448745548725128
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 4.434482097625732
+    - -1.2600376605987549
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 6.863643646240234
+    - -2.0032100677490234
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 4.434482097625732
+    - -1.2600376605987549
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 6.863643646240234
+    - -2.0032100677490234
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 9.103293418884277
+    - -2.673243761062622
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 11.116541862487793
+    - -3.3125171661376953
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 9.103293418884277
+    - -2.673243761062622
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 11.116541862487793
+    - -3.3125171661376953
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 12.62380313873291
+    - -3.831035852432251
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 14.011544227600098
+    - -4.154140472412109
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 12.62380313873291
+    - -3.831035852432251
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 14.011544227600098
+    - -4.154140472412109
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 15.210524559020996
+    - -4.9717698097229
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 16.56041717529297
+    - -5.523442268371582
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 15.210524559020996
+    - -4.9717698097229
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 16.56041717529297
+    - -5.523442268371582
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 17.99707794189453
+    - -6.178153038024902
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 19.745885848999023
+    - -6.8453474044799805
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 17.99707794189453
+    - -6.178153038024902
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 19.745885848999023
+    - -6.8453474044799805
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 22.09321403503418
+    - -7.830938339233398
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 24.247451782226562
+    - -8.623397827148438
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 22.09321403503418
+    - -7.830938339233398
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 24.247451782226562
+    - -8.623397827148438
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 26.005281448364258
+    - -9.575146675109863
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 27.32084083557129
+    - -10.089466094970703
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 26.005281448364258
+    - -9.575146675109863
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 27.32084083557129
+    - -10.089466094970703
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 28.502357482910156
+    - -10.51795482635498
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 31.25067901611328
+    - -11.798831939697266
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 28.502357482910156
+    - -10.51795482635498
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 31.25067901611328
+    - -11.798831939697266
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 32.33708572387695
+    - -12.363241195678711
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 33.55289077758789
+    - -13.360803604125977
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 32.33708572387695
+    - -12.363241195678711
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 33.55289077758789
+    - -13.360803604125977
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 33.82476043701172
+    - -15.600407600402832
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 32.971378326416016
+    - -16.88962173461914
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 33.82476043701172
+    - -15.600407600402832
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 32.971378326416016
+    - -16.88962173461914
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 32.68852233886719
+    - -19.043832778930664
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 2.7933478355407715
+    - 2.1592283248901367
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - -0.6884658932685852
+    - 1.3666093349456787
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 2.7933478355407715
+    - 2.1592283248901367
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 1.5222742557525635
+    - -0.14448745548725128
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 2.7933478355407715
+    - 2.1592283248901367
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 4.434482097625732
+    - -1.2600376605987549
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 1.5728518962860107
+    - -1.4316895008087158
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 1.5222742557525635
+    - -0.14448745548725128
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 1.5728518962860107
+    - -1.4316895008087158
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 4.434482097625732
+    - -1.2600376605987549
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 13.687233924865723
+    - -2.7471368312835693
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 12.62380313873291
+    - -3.831035852432251
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 13.687233924865723
+    - -2.7471368312835693
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 14.011544227600098
+    - -4.154140472412109
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 21.201719284057617
+    - -6.722235679626465
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 19.745885848999023
+    - -6.8453474044799805
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 21.201719284057617
+    - -6.722235679626465
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 22.09321403503418
+    - -7.830938339233398
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 29.729223251342773
+    - -10.389424324035645
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 28.502357482910156
+    - -10.51795482635498
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 29.729223251342773
+    - -10.389424324035645
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 31.25067901611328
+    - -11.798831939697266
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 34.2277946472168
+    - -14.158120155334473
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 33.55289077758789
+    - -13.360803604125977
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 34.2277946472168
+    - -14.158120155334473
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 33.82476043701172
+    - -15.600407600402832
+  width: 1.0
+- !!python/object:__main__.RouteInfo
+  attr_curve: Line
+  attr_traffic: None
+  max_speed: 0.4000000059604645
+  points:
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 33.37110900878906
+    - -17.96581268310547
+  - !!python/object:__main__.Point2DInfo
+    point:
+    - 33.82476043701172
+    - -15.600407600402832
+  width: 1.0
+Stations:
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 1
+  pose:
+  - 2.7933478355407715
+  - 2.1592283248901367
+  - -2.554541826248169
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 2
+  pose:
+  - -0.6884658932685852
+  - 1.3666093349456787
+  - -0.6598064303398132
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 3
+  pose:
+  - 1.5222742557525635
+  - -0.14448745548725128
+  - -0.3101881742477417
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 101
+  pose:
+  - 1.5728518962860107
+  - -1.4316895008087158
+  - 1.7795733213424683
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 4
+  pose:
+  - 4.434482097625732
+  - -1.2600376605987549
+  - -0.32890164852142334
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 5
+  pose:
+  - 9.103293418884277
+  - -2.673243761062622
+  - -0.34280648827552795
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 6
+  pose:
+  - 12.62380313873291
+  - -3.831035852432251
+  - -0.3405213952064514
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 102
+  pose:
+  - 13.687233924865723
+  - -2.7471368312835693
+  - -2.287142038345337
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 7
+  pose:
+  - 14.011544227600098
+  - -4.154140472412109
+  - -0.3478507399559021
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 8
+  pose:
+  - 16.56041717529297
+  - -5.523442268371582
+  - -0.5339146852493286
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 9
+  pose:
+  - 19.745885848999023
+  - -6.8453474044799805
+  - -0.23646162450313568
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 103
+  pose:
+  - 21.201719284057617
+  - -6.722235679626465
+  - -2.4637975692749023
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 10
+  pose:
+  - 22.09321403503418
+  - -7.830938339233398
+  - -0.4247746467590332
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 11
+  pose:
+  - 26.005281448364258
+  - -9.575146675109863
+  - -0.4476211369037628
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 12
+  pose:
+  - 28.502357482910156
+  - -10.51795482635498
+  - -0.3923758864402771
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 104
+  pose:
+  - 29.729223251342773
+  - -10.389424324035645
+  - -2.6552846431732178
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 13
+  pose:
+  - 31.25067901611328
+  - -11.798831939697266
+  - -0.8479442596435547
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 14
+  pose:
+  - 33.55289077758789
+  - -13.360803604125977
+  - -0.8099188208580017
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 15
+  pose:
+  - 33.82476043701172
+  - -15.600407600402832
+  - -2.0602409839630127
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 16
+  pose:
+  - 32.971378326416016
+  - -16.88962173461914
+  - 2.07546067237854
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 105
+  pose:
+  - 33.37110900878906
+  - -17.96581268310547
+  - 2.1253204345703125
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 17
+  pose:
+  - 32.68852233886719
+  - -19.043832778930664
+  - -1.9575681686401367
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 106
+  pose:
+  - 34.2277946472168
+  - -14.158120155334473
+  - -2.9006879329681396
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 18
+  pose:
+  - 11.116541862487793
+  - -3.3125171661376953
+  - 2.835386037826538
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 19
+  pose:
+  - 6.863643646240234
+  - -2.0032100677490234
+  - 2.806342840194702
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 20
+  pose:
+  - 17.99707794189453
+  - -6.178153038024902
+  - -0.39900434017181396
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 21
+  pose:
+  - 24.247451782226562
+  - -8.623397827148438
+  - -0.3781362771987915
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 22
+  pose:
+  - 27.32084083557129
+  - -10.089466094970703
+  - -0.36910340189933777
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 23
+  pose:
+  - 32.33708572387695
+  - -12.363241195678711
+  - -0.7335509657859802
+- !!python/object:__main__.StationInfo
+  attr_task: None
+  id: 24
+  pose:
+  - 15.210524559020996
+  - -4.9717698097229
+  - 2.7285056114196777
