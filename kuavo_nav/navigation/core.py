@@ -4,7 +4,7 @@ import threading
 from enum import Enum
 from std_msgs.msg import String
 
-from . import BaseController, StopHandler, ObstacleDetector, PoseProvider
+from . import BaseController, StopHandler, ObstacleDetector, PoseProvider, RoutePlanner
 
 
 class NavStatus(Enum):
@@ -22,14 +22,16 @@ class NavigationCore:
     """
     def __init__(
         self,
+        route_file: str="configs/route_map.json",
         pose_provider: PoseProvider=None,   
         vel_publisher: BaseController=None,
         stop_handler: StopHandler=None,
         obstacle_detector: ObstacleDetector=None,
-        pos_tolerance: float=0.1,
+        pos_tolerance: float=0.2,
         angle_tolerance: float=0.05,
         rate_hz: int=10
     ):
+        self._route_planner = RoutePlanner(route_file)
         self._pose_provider = pose_provider or PoseProvider()
         self._vel_publisher = vel_publisher or BaseController()
         self._stop_handler = stop_handler or StopHandler()
@@ -77,18 +79,40 @@ class NavigationCore:
                 self._update_status(NavStatus.ARRIVED)
                 return True
             
+            route_list = self._route_planner.plan(
+                start = self._pose_provider.pose,
+                end = (x_target, y_target, yaw_target)
+            )
+            if not route_list:
+                rospy.logerr("No valid route found, aborting navigation")
+                self._update_status(NavStatus.FAILED)
+                return False
+
             rospy.loginfo(f"Navigating to target (x={x_target:.3f}m, y={y_target:.3f}m, yaw={yaw_target:.3f}rad)")
             self._update_status(NavStatus.NAVIGATING)
 
-            # 阶段1: 转向目标点
-            if not self._rotate_to_direction(x_target, y_target):
-                rospy.logwarn("Navigation interrupted during stage1: Rotation to direction")
-                return False
-            
-            # 阶段2: 移动到目标点
-            if not self._move_to_position(x_target, y_target):
-                rospy.logwarn("Navigation interrupted during stage2: Movement to position")
-                return False
+            for point in route_list:
+                # rospy.loginfo(f"Route point: x={point[0]:.3f}, y={point[1]:.3f}, yaw={point[2]:.3f}")
+                x_point, y_point = point
+                
+                # 跳过过近的路径点
+                current_x, current_y, _ = self._pose_provider.pose
+                dx = x_point - current_x
+                dy = y_point - current_y
+                distance = math.hypot(dx, dy)
+                if distance < 0.1:
+                    rospy.loginfo(f"Skipping close route point (x={x_point:.3f}, y={y_point:.3f})")
+                    continue
+
+                # 阶段1: 转向目标点
+                if not self._rotate_to_direction(x_point, y_point):
+                    rospy.logwarn("Navigation interrupted during stage1: Rotation to direction")
+                    return False
+                
+                # 阶段2: 移动到目标点
+                if not self._move_to_position(x_point, y_point):
+                    rospy.logwarn("Navigation interrupted during stage2: Movement to position")
+                    return False
             
             # 阶段3: 转向目标朝向
             if not self._rotate_to_yaw(yaw_target):
@@ -164,7 +188,7 @@ class NavigationCore:
             self._rate.sleep()
         
         # 停止旋转
-        self._vel_publisher.reset()
+        # self._vel_publisher.reset()
         self._rate.sleep()
         return success
     
@@ -210,7 +234,7 @@ class NavigationCore:
             self._rate.sleep()
         
         # 停止移动
-        self._vel_publisher.reset()
+        # self._vel_publisher.reset()
         self._rate.sleep()
         return success
     
