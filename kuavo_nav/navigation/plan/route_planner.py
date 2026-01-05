@@ -30,7 +30,6 @@ class RoutePlanner:
             self._adj[id2].append((id1, cost))
 
     def plan(self, start, end) -> list:
-        print(self._adj)
         sx, sy, _ = start
         ex, ey, _ = end
 
@@ -67,7 +66,7 @@ class RoutePlanner:
         coord_path = [tuple(self._points[id]) for id in id_path]
         coord_path.append((ex, ey))
 
-        print("Final coord path:", coord_path)
+        # print("Final coord path:", coord_path)
         return coord_path
 
     def astar_search(self, start_id: str, end_id: str) -> list | None:
