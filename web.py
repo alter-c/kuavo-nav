@@ -5,6 +5,7 @@ import json
 import threading
 import signal
 import sys
+import argparse
 from std_msgs.msg import String
 from flask import Flask, request, jsonify
 
@@ -93,13 +94,20 @@ def signal_handler(sig, frame):
     rospy.signal_shutdown("User interrupt")
     sys.exit(0)
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Kuavo Navigation Web Interface")
+    parser.add_argument("--host", type=str, default="0.0.0.0", help="Web server host")
+    parser.add_argument("--port", type=int, default=8080, help="Web server port")
+    return parser.parse_args()
+
 if __name__ == '__main__':
+    args = parse_args()
     signal.signal(signal.SIGINT, signal_handler)
 
     ros_thread = threading.Thread(target=ros_spin_thread, daemon=True)
     ros_thread.start()
 
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host=args.host, port=args.port)
     # curl "http://0.0.0.0:8080/api/navigation/start?cid=target_2"
     # curl "http://0.0.0.0:8080/api/navigation/nav?x=1.0&y=1.0&yaw=1.57"
 
