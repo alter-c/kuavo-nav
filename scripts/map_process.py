@@ -1,6 +1,8 @@
 import json
 import yaml
 
+origin_task_file = '/home/kuavo/maps/baai_2l/task.yaml'
+origin_route_file = '/home/kuavo/maps/baai_2l/route.yaml'
 
 tags_to_remove = [
     "!!python/object:task_manager.TaskInfo",
@@ -15,7 +17,6 @@ def remove_tags(text, tags):
 
 
 # task process -------------------------------------------------
-origin_task_file = '../configs/baai_2l/task.yaml'
 with open(origin_task_file, 'r') as f:
     text = f.read()
 text = remove_tags(text, tags_to_remove)
@@ -36,7 +37,6 @@ with open(process_task_file, 'w') as f:
 
 
 # route process ------------------------------------------------
-origin_route_file = '../configs/baai_2l/route.yaml'
 with open(origin_route_file, 'r') as f:
     text = f.read()
 text = remove_tags(text, tags_to_remove)

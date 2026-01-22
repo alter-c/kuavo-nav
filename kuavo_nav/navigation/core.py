@@ -18,7 +18,7 @@ class NavStatus(Enum):
 class NavigationCore:
     """
     导航核心模块
-    三阶段导航：转向目标点 -> 移动到目标点 -> 转向目标朝向
+    导航逻辑：(转向目标点 -> 移动到目标点)*n -> 转向目标朝向
     """
     def __init__(
         self,

@@ -66,7 +66,7 @@ def state():
             "data": None
         }), 404
 
-# test pose nav
+# 仅用于测试位置导航
 @app.route("/api/navigation/nav", methods=["GET"])
 def nav():
     x = float(request.args.get("x", 0.0))
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     ros_thread.start()
 
     app.run(host='0.0.0.0', port=8080)
-    # curl "http://0.0.0.0:8080/api/navigation/start?cid=point_1"
+    # curl "http://0.0.0.0:8080/api/navigation/start?cid=target_2"
     # curl "http://0.0.0.0:8080/api/navigation/nav?x=1.0&y=1.0&yaw=1.57"
 
 
