@@ -91,7 +91,7 @@ class NavigationCore:
             rospy.loginfo(f"Navigating to target (x={x_target:.3f}m, y={y_target:.3f}m, yaw={yaw_target:.3f}rad)")
             self._update_status(NavStatus.NAVIGATING)
 
-            for point in route_list:
+            for i, point in enumerate(route_list):
                 # rospy.loginfo(f"Route point: x={point[0]:.3f}, y={point[1]:.3f}, yaw={point[2]:.3f}")
                 x_point, y_point = point
                 
@@ -100,7 +100,7 @@ class NavigationCore:
                 dx = x_point - current_x
                 dy = y_point - current_y
                 distance = math.hypot(dx, dy)
-                if distance < 0.1:
+                if distance < 0.3:
                     rospy.loginfo(f"Skipping close route point (x={x_point:.3f}, y={y_point:.3f})")
                     continue
 
@@ -194,12 +194,17 @@ class NavigationCore:
     
     def _rotate_to_direction(self, x_target, y_target):
         """阶段1: 转向目标点方向"""
-        current_x, current_y, _ = self._pose_provider.pose
+        current_x, current_y, current_yaw = self._pose_provider.pose
         target_yaw = math.atan2(y_target - current_y, x_target - current_x)
+        print("current_yaw:", current_yaw, "target_yaw:", target_yaw)
+        # 如果已经朝向目标方向, 则跳过旋转
+        if abs(self._normalize_angle(target_yaw - current_yaw)) < 0.3:
+            rospy.loginfo("Already facing target direction, skipping rotation")
+            return True
         rospy.loginfo(f"Rotating to target position (direction yaw={target_yaw:.3f}rad)")
         return self._rotate_to(target_yaw)
     
-    def _move_to_position(self, x_target, y_target):
+    def _move_to_position(self, x_target, y_target, reset=False):
         """阶段2: 直线微调移动到目标位置"""
         success = False
         rospy.loginfo(f"Moving to target position (x={x_target:.3f}m, y={y_target:.3f}m)")
@@ -228,7 +233,8 @@ class NavigationCore:
             yaw_error = self._normalize_angle(desired_yaw - current_yaw)
             
             # P控制器
-            cmd_linear = 0.5 * distance
+            # cmd_linear = 0.5 * distance
+            cmd_linear = 0.5
             cmd_angular = 1.0 * yaw_error
             self._vel_publisher.move(cmd_linear, cmd_angular)
             self._rate.sleep()

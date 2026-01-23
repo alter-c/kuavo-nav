@@ -13,7 +13,7 @@ if __name__ == "__main__":
     elif args.command == "stop":
         os.system(f"curl '0.0.0.0:8080/api/navigation/stop'")
     elif args.command == "state":
-        os.system(f"curl '0.0.0.0:8080/api/navigation/state?task_id={args.task_id}'")
+        os.system(f"curl '0.0.0.0:8080/api/navigation/state?task={args.task_id}'")
     else:
         print(f"Unknown command: {args.command}")
 
