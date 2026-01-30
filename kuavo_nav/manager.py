@@ -7,6 +7,7 @@ from datetime import datetime
 from std_msgs.msg import String
 
 from .navigation.core import NavigationCore
+from .action import ActionExecutor
 
 
 class NavigationManager:
@@ -14,6 +15,7 @@ class NavigationManager:
     def __init__(
         self,
         navigator: NavigationCore=None,
+        actor: ActionExecutor=None,
         map_file: str="configs/task_map.json",
         rate_hz: int=10
     ):
@@ -21,6 +23,7 @@ class NavigationManager:
             raise ValueError("NavigationCore is not initialized")
         
         self._navigator = navigator
+        self._actor = actor or ActionExecutor()
         self._map = load_map(map_file)
         self._rate = rospy.Rate(rate_hz)
         self._lock = threading.Lock()
@@ -93,6 +96,12 @@ class NavigationManager:
             elif command == "cancel":
                 rospy.loginfo("Received cancel command")
                 self._handle_cancel()
+            elif command == "action":
+                rospy.loginfo("Received action command")
+                self._handle_action(cmd_dict)
+            elif command == "gesture":
+                rospy.loginfo("Received gesture command")
+                self._handle_gesture(cmd_dict)
             else:
                 rospy.logwarn(f"Unknown command: {command}")
                 
@@ -122,6 +131,29 @@ class NavigationManager:
     def _handle_cancel(self):
         """处理取消导航命令"""
         self._navigator.cancel()
+        return
+    
+    def _handle_action(self, cmd_dict: dict):
+        """处理动作命令"""
+        action = cmd_dict.get("target")
+        self._actor.execute(action)
+        return
+    
+    def _handle_gesture(self, cmd_dict: dict):
+        """处理对话手势命令"""
+        gesture = cmd_dict.get("target")
+        if gesture == "start":
+            if self._navigator.status == "arrived":
+                gesture_thread = threading.Thread(
+                    target=self._actor.gesture,
+                    daemon=True
+                )
+                gesture_thread.start()
+            else:
+                rospy.logwarn("Not arrived, cannot execute gesture")
+                return
+        elif gesture == "stop":
+            self._actor.stop_gesture()
         return
     
     def _parse_target(self, target):

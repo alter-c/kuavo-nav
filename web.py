@@ -66,6 +66,87 @@ def state():
             "message": "Task not found",
             "data": None
         }), 404
+    
+@app.route("/api/bracelet/handover", methods=["GET"])
+def handover():
+    nav_state = get_state()
+    return jsonify({
+        "success": True,
+        "message": None,
+        "data": {
+            nav_state["update_time"]
+        }
+    })
+
+@app.route("/api/greeting/hello", methods=["GET"])
+def hello():
+    hello_action = "wave"
+    cmd = {
+        "command": "action",
+        "target": hello_action
+    }
+    cmd_pub.publish(String(data=json.dumps(cmd)))
+    rospy.loginfo(f"Published greeting/hello command: {cmd}")
+    nav_state = get_state()
+    return jsonify({
+        "success": True,
+        "message": None,
+        "data": {
+            nav_state["update_time"]
+        }
+    })
+
+@app.route("/api/greeting/bye", methods=["GET"])
+def bye():
+    bye_action = "wave"
+    cmd = {
+        "command": "action",
+        "target": bye_action
+    }
+    cmd_pub.publish(String(data=json.dumps(cmd)))
+    rospy.loginfo(f"Published greeting/bye command: {cmd}")
+    nav_state = get_state()
+    return jsonify({
+        "success": True,
+        "message": None,
+        "data": {
+            nav_state["update_time"]
+        }
+    })
+
+@app.route("/api/gesture/start", methods=["GET"])
+def gesture_start():
+    cmd = {
+        "command": "gesture",
+        "target": "start"
+    }
+    cmd_pub.publish(String(data=json.dumps(cmd)))
+    rospy.loginfo(f"Published gesture/start command: {cmd}")
+    nav_state = get_state()
+    return jsonify({
+        "success": True,
+        "message": None,
+        "data": {
+            nav_state["update_time"]
+        }
+    })
+
+@app.route("/api/gesture/stop", methods=["GET"])
+def gesture_stop():
+    cmd = {
+        "command": "gesture",
+        "target": "stop"
+    }
+    cmd_pub.publish(String(data=json.dumps(cmd)))
+    rospy.loginfo(f"Published gesture/stop command: {cmd}")
+    nav_state = get_state()
+    return jsonify({
+        "success": True,
+        "message": None,
+        "data": {
+            nav_state["update_time"]
+        }
+    })
 
 # 仅用于测试位置导航
 @app.route("/api/navigation/nav", methods=["GET"])
