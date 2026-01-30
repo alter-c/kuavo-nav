@@ -74,7 +74,7 @@ def handover():
         "success": True,
         "message": None,
         "data": {
-            nav_state["update_time"]
+            "update_time": nav_state["update_time"]
         }
     })
 
@@ -92,7 +92,7 @@ def hello():
         "success": True,
         "message": None,
         "data": {
-            nav_state["update_time"]
+            "update_time": nav_state["update_time"]
         }
     })
 
@@ -110,7 +110,7 @@ def bye():
         "success": True,
         "message": None,
         "data": {
-            nav_state["update_time"]
+            "update_time": nav_state["update_time"]
         }
     })
 
@@ -127,7 +127,7 @@ def gesture_start():
         "success": True,
         "message": None,
         "data": {
-            nav_state["update_time"]
+            "update_time": nav_state["update_time"]
         }
     })
 
@@ -144,7 +144,7 @@ def gesture_stop():
         "success": True,
         "message": None,
         "data": {
-            nav_state["update_time"]
+            "update_time": nav_state["update_time"]
         }
     })
 
@@ -188,7 +188,7 @@ if __name__ == '__main__':
     ros_thread = threading.Thread(target=ros_spin_thread, daemon=True)
     ros_thread.start()
 
-    app.run(host=args.host, port=args.port)
+    app.run(host=args.host, port=args.port, debug=False)
     # curl "http://0.0.0.0:8080/api/navigation/start?cid=target_2"
     # curl "http://0.0.0.0:8080/api/navigation/nav?x=1.0&y=1.0&yaw=1.57"
 

@@ -1,12 +1,13 @@
 import requests
 import random
+import rospy
 
 class ActionExecutor:
     def __init__(self, robot: str="kuavo", port: int=8090):
         self.robot = robot
         self.port = port
         self.host_dict = {
-            "kuavo": "10.0.100.7",
+            "kuavo": "192.168.26.12",
             "unitree": "10.0.100.9"
         }
         self.base_url = f"http://{self.host_dict[self.robot]}:{self.port}"
