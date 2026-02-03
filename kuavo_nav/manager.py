@@ -136,13 +136,13 @@ class NavigationManager:
     def _handle_action(self, cmd_dict: dict):
         """处理动作命令"""
         action = cmd_dict.get("target")
-        self._actor.execute(action)
-        # action_thread = threading.Thread(
-        #     target=self._actor.execute,
-        #     args=(action,),
-        #     daemon=True
-        # )
-        # action_thread.start()
+        # self._actor.execute(action)
+        action_thread = threading.Thread(
+            target=self._actor.execute,
+            args=(action,),
+            daemon=True
+        )
+        action_thread.start()
         return
     
     def _handle_gesture(self, cmd_dict: dict):
