@@ -120,6 +120,7 @@ class NavigationManager:
         # 线程启动导航
         x, y, yaw = pose
         # TODO 封装导航和动作, 统一线程执行
+        self._actor.change_mode(1) # 切换为行走模式
         nav_thread = threading.Thread(
             target=self._navigator.navigate, 
             args=(x, y, yaw),
