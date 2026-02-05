@@ -52,9 +52,12 @@ def stop():
 
 @app.route("/api/navigation/state", methods=["GET"])
 def state():
+    import time
+    time.sleep(2)
     task_id = str(request.args.get("task"))
     nav_state = get_state()
     if task_id and nav_state["task_id"] == task_id:
+        print(nav_state)
         return jsonify({
             "success": True,
             "message": None,
@@ -188,7 +191,7 @@ if __name__ == '__main__':
     ros_thread = threading.Thread(target=ros_spin_thread, daemon=True)
     ros_thread.start()
 
-    app.run(host=args.host, port=args.port, debug=False)
+    app.run(host=args.host, port=args.port, debug=True)
     # curl "http://0.0.0.0:8080/api/navigation/start?cid=target_2"
     # curl "http://0.0.0.0:8080/api/navigation/nav?x=1.0&y=1.0&yaw=1.57"
 

@@ -21,6 +21,7 @@ class ActionExecutor:
             "mode": mode
         }
         res = requests.post(f"{self.base_url}/api/v1/perform", json=info)
+        rospy.loginfo(f"Execute {self.robot} action: {action} in mode {mode}")
         return res.json()
     
     def change_mode(self, mode: int):
@@ -30,6 +31,7 @@ class ActionExecutor:
             "mode": mode
         }
         res = requests.post(f"{self.base_url}/api/v1/mode", json=info)
+        rospy.loginfo(f"Change {self.robot} mode to {mode}")
         return res.json()
     
     def gesture(self):

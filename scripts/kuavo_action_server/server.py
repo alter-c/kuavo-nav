@@ -38,7 +38,7 @@ def perform_action(request: PerformRequest):
 
     try:
         result = subprocess.run(
-            ["./bin/action.sh", action, mode],
+            ["./bin/action.sh", action, str(mode)],
             capture_output=True,
             timeout=10
         )
@@ -70,7 +70,7 @@ def change_mode(request: PerformRequest):
         }
 
     try:
-        cmd = ["./bin/mode.sh", mode]
+        cmd = ["./bin/mode.sh", str(mode)]
         result = subprocess.run(
             cmd,
             capture_output=True,
