@@ -52,8 +52,6 @@ def stop():
 
 @app.route("/api/navigation/state", methods=["GET"])
 def state():
-    import time
-    time.sleep(2)
     task_id = str(request.args.get("task"))
     nav_state = get_state()
     if task_id and nav_state["task_id"] == task_id:

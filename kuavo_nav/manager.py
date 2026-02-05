@@ -6,9 +6,8 @@ import threading
 from datetime import datetime
 from std_msgs.msg import String
 
-from .navigation.core import NavigationCore
+from .navigation.core import NavigationCore, NavStatus
 from .action import ActionExecutor
-
 
 class NavigationManager:
     """导航管理模块"""
@@ -111,6 +110,8 @@ class NavigationManager:
     def _handle_navigate(self, cmd_dict: dict):
         """处理导航命令"""
         try:
+            # 此处直接更新状态为开始导航, TODO 后续需要重新设计逻辑
+            self._navigator._update_status(NavStatus.STARTING)
             target = cmd_dict.get("target")
             cid, pose = self._parse_target(target)
         except Exception as e:
