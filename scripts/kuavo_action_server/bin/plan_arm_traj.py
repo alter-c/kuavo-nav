@@ -479,7 +479,8 @@ def main():
         if success:
             finish_time = data["finish"] * 0.01 + 2
             rospy.sleep(finish_time)
-            call_change_arm_ctrl_mode_service(args.mode) # 切换回指定的手臂控制模式: 1-自然摆手, 2-双臂控制
+            if args.mode != 0:
+              call_change_arm_ctrl_mode_service(args.mode) # 切换回指定的手臂控制模式: 1-自然摆手, 2-双臂控制
             sys.exit(0)
         else:
             rospy.logerr("Failed to plan arm trajectory.")

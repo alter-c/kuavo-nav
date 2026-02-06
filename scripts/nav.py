@@ -12,6 +12,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.command == "start":
+        os.system(f"curl '0.0.0.0:8080/api/gesture/start'")
+        time.sleep(5)
+        os.system(f"curl '0.0.0.0:8080/api/gesture/stop'")
         # os.system(f"curl '0.0.0.0:8080/api/navigation/start?cid={args.cat_id}'")
         resp = requests.get(f"http://0.0.0.0:8080/api/navigation/start", params={"cid": args.cat_id})
         print(resp.text)

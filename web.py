@@ -6,6 +6,7 @@ import threading
 import signal
 import sys
 import argparse
+import time
 from std_msgs.msg import String
 from flask import Flask, request, jsonify
 
@@ -52,6 +53,7 @@ def stop():
 
 @app.route("/api/navigation/state", methods=["GET"])
 def state():
+    time.sleep(0.5) # 等待状态更新
     task_id = str(request.args.get("task"))
     nav_state = get_state()
     if task_id and nav_state["task_id"] == task_id:

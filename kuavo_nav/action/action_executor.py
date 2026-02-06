@@ -45,7 +45,7 @@ class ActionExecutor:
             if gesture_actions == []:
                 gesture_actions = ["左手扶胸", "点赞", "左手邀请", "右手邀请"]
             action = random.choice(gesture_actions)
-            self.execute(action, mode=2)
+            self.execute(action, mode=0)
             gesture_actions.remove(action)
         return
     
