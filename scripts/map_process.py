@@ -4,6 +4,9 @@ import yaml
 origin_task_file = '/home/kuavo/maps/baai_2l/task.yaml'
 origin_route_file = '/home/kuavo/maps/baai_2l/route.yaml'
 
+# origin_task_file = '/home/kuavo/maps/zhiyuansamll/task.yaml'
+# origin_route_file = '/home/kuavo/maps/zhiyuansamll/route.yaml'
+
 tags_to_remove = [
     "!!python/object:task_manager.TaskInfo",
     "!!python/object:__main__.RouteInfo",
