@@ -254,7 +254,7 @@ class NavigationCore:
         # 停障
         rospy.logwarn("Obstacle detected!")
         self._vel_publisher.reset()
-        self._update_status(NavStatus.OBSTACLE)
+        self._update_status(NavStatus.NAVIGATING) # 去掉避障状态
         # TODO 避障语音
         self._obstacle_detector.report()
         while self._obstacle_detector.check():
