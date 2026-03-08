@@ -29,7 +29,8 @@ class NavigationCore:
         obstacle_detector: ObstacleDetector=None,
         pos_tolerance: float=0.2,
         angle_tolerance: float=0.05,
-        rate_hz: int=10
+        rate_hz: int=10,
+        use_route: bool=True
     ):
         self._route_planner = RoutePlanner(route_file)
         self._pose_provider = pose_provider or PoseProvider()
@@ -47,6 +48,9 @@ class NavigationCore:
         self._status = NavStatus.IDLE
         self._run_lock = threading.Lock()
         self._running = False
+
+        # 路径规划（导览/导购）
+        self.use_route = use_route
         
         rospy.loginfo("Navigation core initialized!")
 
@@ -78,15 +82,17 @@ class NavigationCore:
                 rospy.loginfo("Already at target pose, skipping navigation")
                 self._update_status(NavStatus.ARRIVED)
                 return True
-            
-            route_list = self._route_planner.plan(
-                start = self._pose_provider.pose,
-                end = (x_target, y_target, yaw_target)
-            )
-            if not route_list:
-                rospy.logerr("No valid route found, aborting navigation")
-                self._update_status(NavStatus.FAILED)
-                return False
+            if self.use_route:
+                route_list = self._route_planner.plan(
+                    start = self._pose_provider.pose,
+                    end = (x_target, y_target, yaw_target)
+                )
+                if not route_list:
+                    rospy.logerr("No valid route found, aborting navigation")
+                    self._update_status(NavStatus.FAILED)
+                    return False
+            else:
+                route_list = [(x_target, y_target)]
 
             rospy.loginfo(f"Navigating to target (x={x_target:.3f}m, y={y_target:.3f}m, yaw={yaw_target:.3f}rad)")
             self._update_status(NavStatus.NAVIGATING)

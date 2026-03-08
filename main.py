@@ -9,7 +9,7 @@ if __name__ == '__main__':
     rospy.init_node('kuavo_navigation', anonymous=True)
 
     # 初始化导航节点
-    navigator = NavigationCore()
+    navigator = NavigationCore(use_route=False)
     nav_manager = NavigationManager(navigator=navigator)
 
     nav_manager.start()
